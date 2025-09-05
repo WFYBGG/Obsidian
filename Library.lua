@@ -112,7 +112,7 @@ local ObsidianImageManager = {
     }
 }
 do
-    local BaseURL = "https://raw.githubusercontent.com/WFYBGG/Obsidian/main/"
+    local BaseURL = "https://raw.githubusercontent.com/WFYBGG/Obsidian/refs/heads/main/"
     --local BaseURL = "https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/"
 
     local function RecursiveCreatePath(Path: string, IsFile: boolean?)
