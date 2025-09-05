@@ -90,7 +90,8 @@ end
 function SetupLucide()
 	if not fs.isDir("build/lucide") then
 		print("Cloning Lucide repository...")
-		RunCommand("git clone --filter=blob:none --sparse https://github.com/lucide-icons/lucide.git", "build")
+		--RunCommand("git clone --filter=blob:none --sparse https://github.com/lucide-icons/lucide.git", "build")
+		RunCommand("git clone --filter=blob:none --sparse https://github.com/WFYBGG/lucide.git", "build")
 	end
 
 	RunCommand("git sparse-checkout set --no-cone icons", "build/lucide")
