@@ -1,6 +1,8 @@
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
+
+-- Original Services
 local CoreGui: CoreGui = cloneref(game:GetService("CoreGui"))
 local Players: Players = cloneref(game:GetService("Players"))
 local RunService: RunService = cloneref(game:GetService("RunService"))
@@ -10,6 +12,12 @@ local TextService: TextService = cloneref(game:GetService("TextService"))
 local Teams: Teams = cloneref(game:GetService("Teams"))
 local TweenService: TweenService = cloneref(game:GetService("TweenService"))
 
+-- Added Services
+local RenderStepped = RunService.RenderStepped;
+local LocalPlayer = Players.LocalPlayer;
+local Mouse = LocalPlayer:GetMouse();
+
+-- Start Stealth Library
 local getgenv = getgenv or function()
     return shared
 end
@@ -1086,7 +1094,8 @@ local ModalScreenGui = New("ScreenGui", {
     DisplayOrder = 999,
     ResetOnSpawn = false,
 })
-ParentUI(ModalScreenGui, true)
+ParentUI(ModalScreenGui)         -- Modified Insertion [Parents to gethui(), with ProtectGui First]
+--ParentUI(ModalScreenGui, true) -- Original Code (Parents to CoreGui)
 
 local ModalElement = New("TextButton", {
     BackgroundTransparency = 1,
