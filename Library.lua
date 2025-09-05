@@ -97,14 +97,14 @@ local Library = {
 local ObsidianImageManager = {
     Assets = {
         TransparencyTexture = {
-            RobloxId = 139785960036434,
+            RobloxId = 99802253758244,
             Path = "Obsidian/assets/TransparencyTexture.png",
 
             Id = nil
         },
         
         SaturationMap = {
-            RobloxId = 4155801252,
+            RobloxId = 130263960919666,
             Path = "Obsidian/assets/SaturationMap.png",
 
             Id = nil
@@ -112,7 +112,8 @@ local ObsidianImageManager = {
     }
 }
 do
-    local BaseURL = "https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/"
+    local BaseURL = "https://raw.githubusercontent.com/WFYBGG/Obsidian/main/"
+    --local BaseURL = "https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/"
 
     local function RecursiveCreatePath(Path: string, IsFile: boolean?)
         if not isfolder or not makefolder then return end
