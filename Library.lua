@@ -1824,7 +1824,7 @@ end
 
 local CheckIcon = Library:GetIcon("check")
 local ArrowIcon = Library:GetIcon("chevron-up")
-local ResizeIcon = Library:GetIcon("move-diagonal-2")
+local ResizeIcon = Library:GetIcon("expand")
 local KeyIcon = Library:GetIcon("key")
 
 local BaseAddons = {}
