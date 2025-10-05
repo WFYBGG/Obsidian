@@ -77,7 +77,7 @@ local Library = {
 	groupbox:AddCheckbox(checkboxKey, {
 	    Text = prettyBase,
 	    Default = false,
-	    RightSide = true, -- 👈 puts the square on the right for this checkbox only
+	    CheckboxRightSide = true, -- 👈 puts the square on the right for this checkbox only
 	})]]
     ShowToggleFrameInKeybinds = true,
     NotifyOnError = false,
