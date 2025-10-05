@@ -72,6 +72,13 @@ local Library = {
     NotifySide = "Right",
     ShowCustomCursor = true,
     ForceCheckbox = false,
+	CheckboxOnRight = false, -- Set to true to make right-side the default everywhere (example below)
+	--[[
+	groupbox:AddCheckbox(checkboxKey, {
+	    Text = prettyBase,
+	    Default = false,
+	    RightSide = true, -- 👈 puts the square on the right for this checkbox only
+	})]]
     ShowToggleFrameInKeybinds = true,
     NotifyOnError = false,
 
@@ -3105,6 +3112,21 @@ do
             CornerRadius = UDim.new(0, Library.CornerRadius / 2),
             Parent = Checkbox,
         })
+
+		-- RIGHT-SIDE CHECKBOX BEGIN
+		local CheckboxRightSide = (Info.RightSide == true) or (Library.CheckboxOnRight == true)
+		if CheckboxRightSide then
+		    Label.Position = UDim2.fromOffset(0, 0) -- Put text on the left and reserve 26px on the right for the box
+		    Label.Size = UDim2.new(1, -26, 1, 0) 
+		    Checkbox.AnchorPoint = Vector2.new(1, 0) -- Pin the checkbox to the right edge
+		    Checkbox.Position = UDim2.fromScale(1, 0)
+		else
+		    Label.Position = UDim2.fromOffset(26, 0) -- Default (checkbox on the left)
+		    Label.Size = UDim2.new(1, -26, 1, 0)
+		    Checkbox.AnchorPoint = Vector2.new(0, 0)
+		    Checkbox.Position = UDim2.fromOffset(0, 0)
+		end 
+		-- RIGHT-SIDE CHECKBOX END
 
         local CheckboxStroke = New("UIStroke", {
             Color = "OutlineColor",
