@@ -3081,14 +3081,11 @@ do
             BackgroundTransparency = 1,
             Position = UDim2.fromOffset(0, 0),
             Size = UDim2.new(1, -26, 1, 0),
-		    Size = UDim2.new(1, -24, 1, 0),             -- temp; we’ll override width dynamically below
-		    AutomaticSize = Enum.AutomaticSize.Y,       -- add this so it can grow in height
-		    TextWrapped = true,                          -- add this
-		    TextXAlignment = Enum.TextXAlignment.Left,  -- keep text left aligned
             Text = Toggle.Text,
             TextSize = 14,
             TextTransparency = 0.4,
             TextXAlignment = Enum.TextXAlignment.Left,
+			TextTruncate = Enum.TextTruncate.AtEnd, -- Auto cut off text
             Parent = Button,
         })
 
@@ -3127,19 +3124,6 @@ do
             Parent = Checkbox,
         })
 
-		-- Dynamically update checkbox label to "wrap text"
-		do -- keep label width clear of the right-side checkbox, even if DPI/row height changes
-		    local Padding = 6 -- gap between label text and checkbox
-		    local function SyncRightSide()
-		        local Height = math.max(Button.AbsoluteSize.Y, 1) -- Checkbox is square: Width == Row Height
-		        Checkbox.Position = UDim2.new(1, -Height, 0, 0)
-		        Label.Size = UDim2.new(1, -(Height + Padding), 1, 0) -- Shrink label width by Checkbox Width + Padding
-		    end
-		    SyncRightSide()
-		    Button:GetPropertyChangedSignal("AbsoluteSize"):Connect(SyncRightSide)
-		end
-		-- End of added section to wrap checkbox label text / resizing
-		
         function Toggle:UpdateColors()
             Toggle:Display()
         end
