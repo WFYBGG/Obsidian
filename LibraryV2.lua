@@ -1,3 +1,26 @@
+--[[
+How to use the new dependency dropdown label checkbox:
+	local dep = Groupbox:AddDependencyBox()
+	
+	local dd = dep:AddDropdown("PropDropdown_BluesteelArmour", {
+	    Text       = "Bluesteel Armour",
+	    Values     = ValuesPretty,
+	    Default    = "",
+	    Multi      = false,
+	    Searchable = true,
+	})
+	
+	-- Add the checkbox to the dropdown's label:
+	dd:AddCheckbox("PropCheckbox_BluesteelArmour", {
+	    Default = false
+	})
+	
+	-- Show the dropdown only when the inline checkbox is ON:
+	dep:SetupDependencies({
+	    { Toggles.PropCheckbox_BluesteelArmour, true },
+	})
+]]
+
 local cloneref = (cloneref or clonereference or function(instance: any)
     return instance
 end)
@@ -1830,6 +1853,111 @@ local KeyIcon = Library:GetIcon("key")
 local BaseAddons = {}
 do
     local Funcs = {}
+
+	function Funcs:AddCheckbox(Idx, Info)
+	    Info = Library:Validate(Info, Templates.Toggle)
+	
+	    local ParentObj   = self
+	    local ToggleLabel = ParentObj.TextLabel
+	
+	    local Toggle = {
+	        Text     = Info.Text,
+	        Value    = Info.Default,
+	        Tooltip  = Info.Tooltip,
+	        DisabledTooltip = Info.DisabledTooltip,
+	        Callback = Info.Callback,
+	        Changed  = Info.Changed,
+	        Disabled = Info.Disabled,
+	        Visible  = Info.Visible,
+	        Addons   = {},
+	        Type     = "Toggle",
+	    }
+	
+	    -- tiny, right-aligned clickable area inside the label
+	    local Button = New("TextButton", {
+	        Active = not Toggle.Disabled,
+	        BackgroundTransparency = 1,
+	        Size = UDim2.fromOffset(18, 18),
+	        Text = "",
+	        Visible = Toggle.Visible,
+	        Parent = ToggleLabel,
+	    })
+	
+	    local Checkbox = New("Frame", {
+	        BackgroundColor3 = "MainColor",
+	        Size = UDim2.fromScale(1, 1),
+	        SizeConstraint = Enum.SizeConstraint.RelativeYY,
+	        Parent = Button,
+	    })
+	    New("UICorner", { CornerRadius = UDim.new(0, Library.CornerRadius/2), Parent = Checkbox })
+	    local CheckboxStroke = New("UIStroke", { Color = "OutlineColor", Parent = Checkbox })
+	    local CheckImage = New("ImageLabel", {
+	        Image = CheckIcon and CheckIcon.Url or "",
+	        ImageColor3 = "FontColor",
+	        ImageRectOffset = CheckIcon and CheckIcon.ImageRectOffset or Vector2.zero,
+	        ImageRectSize   = CheckIcon and CheckIcon.ImageRectSize   or Vector2.zero,
+	        ImageTransparency = 1,
+	        Position = UDim2.fromOffset(2, 2),
+	        Size = UDim2.new(1, -4, 1, -4),
+	        Parent = Checkbox,
+	    })
+	
+	    function Toggle:Display()
+	        if Library.Unloaded then return end
+	        CheckboxStroke.Transparency = Toggle.Disabled and 0.5 or 0
+	
+	        if Toggle.Disabled then
+	            CheckImage.ImageTransparency = Toggle.Value and 0.8 or 1
+	            Checkbox.BackgroundColor3 = Library.Scheme.BackgroundColor
+	            Library.Registry[Checkbox].BackgroundColor3 = "BackgroundColor"
+	            return
+	        end
+	
+	        CheckImage.ImageTransparency = Toggle.Value and 0 or 1
+	        Checkbox.BackgroundColor3 = Library.Scheme.MainColor
+	        Library.Registry[Checkbox].BackgroundColor3 = "MainColor"
+	    end
+	
+	    function Toggle:SetValue(v)
+	        if Toggle.Disabled then return end
+	        Toggle.Value = v
+	        Toggle:Display()
+	        Library:SafeCallback(Toggle.Callback, Toggle.Value)
+	        Library:SafeCallback(Toggle.Changed,  Toggle.Value)
+	        Library:UpdateDependencyBoxes()
+	    end
+	
+	    function Toggle:SetDisabled(d)
+	        Toggle.Disabled = d
+	        Button.Active = not Toggle.Disabled
+	        if Toggle.TooltipTable then Toggle.TooltipTable.Disabled = d end
+	        Toggle:Display()
+	    end
+	
+	    function Toggle:SetVisible(vis)
+	        Toggle.Visible = vis
+	        Button.Visible = vis
+	    end
+	
+	    Button.MouseButton1Click:Connect(function()
+	        if Toggle.Disabled then return end
+	        Toggle:SetValue(not Toggle.Value)
+	    end)
+	
+	    if typeof(Toggle.Tooltip) == "string" or typeof(Toggle.DisabledTooltip) == "string" then
+	        Toggle.TooltipTable = Library:AddTooltip(Toggle.Tooltip, Toggle.DisabledTooltip, Button)
+	        Toggle.TooltipTable.Disabled = Toggle.Disabled
+	    end
+	
+	    Toggle:Display()
+	
+	    Options[Idx] = Toggle
+	    Toggles[Idx] = Toggle
+	    table.insert(ParentObj.Addons, Toggle)
+	
+	    return ParentObj -- chainable, same as other addons
+	end
+
 
     function Funcs:AddKeyPicker(Idx, Info)
         Info = Library:Validate(Info, Templates.KeyPicker)
@@ -3923,6 +4051,13 @@ do
             Parent = Holder,
         })
 
+		New("UIListLayout", {
+		    FillDirection = Enum.FillDirection.Horizontal,
+		    HorizontalAlignment = Enum.HorizontalAlignment.Right,
+		    Padding = UDim.new(0, 6),
+		    Parent = Label,
+		})
+
         local Display = New("TextButton", {
             Active = not Dropdown.Disabled,
             AnchorPoint = Vector2.new(0, 1),
@@ -4310,6 +4445,11 @@ do
 
         Dropdown.Holder = Holder
         table.insert(Groupbox.Elements, Dropdown)
+
+		Dropdown.Addons = {}
+		Dropdown.TextLabel = Label
+		Dropdown.Container = Container
+		setmetatable(Dropdown, BaseAddons)
 
         Options[Idx] = Dropdown
 
@@ -4786,16 +4926,29 @@ do
                             return
                         end
                     end
-                end
+				end
             end
 
-            Depbox.Visible = true
-            DepboxContainer.Visible = true
-            if not Library.Searching then
-                Depbox:Resize()
-            elseif not CancelSearch then
-                Library:UpdateSearch(Library.SearchText)
-            end
+			Depbox.Visible = true
+			DepboxContainer.Visible = true
+
+			if not Library.Searching then
+			    -- Restore children that the search may have hidden
+			    for _, ElementInfo in pairs(Depbox.Elements) do
+			        ElementInfo.Holder.Visible =
+			            (typeof(ElementInfo.Visible) == "boolean") and ElementInfo.Visible or true
+			
+			        if ElementInfo.SubButton then
+			            ElementInfo.Base.Visible = ElementInfo.Visible
+			            ElementInfo.SubButton.Base.Visible = ElementInfo.SubButton.Visible
+			        end
+			    end
+			
+			    Depbox:Resize()
+			elseif not CancelSearch then
+			    Library:UpdateSearch(Library.SearchText)
+			end
+
         end
 
         function Depbox:SetupDependencies(Dependencies)
